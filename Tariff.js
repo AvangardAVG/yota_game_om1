@@ -3,25 +3,26 @@ class Tariff {
         this.width = adaptive / 5.5;
         this.height = adaptive / 4;
         this.x = cnvs_w / 2;
-        this.y = cnvs_h / 2;
+        this.y = cnvs_h - this.height / 2 - 2 * simple_font_size * cloud_txt_ratio;
         this.yota = new Image();
         this.yota.src = "res/yota.png";
-        this.yota_scale = this.width / this.yota.width / 2.5;
-        this.yota_width = this.yota.width * this.yota_scale;
-        this.yota_height = this.yota.height * this.yota_scale;
-        this.yota_x = this.x - this.yota_width / 2;
-        this.yota_y = this.y - this.yota_height / 2 - this.height / 7;
+        this.yota_scale = 0;
+        this.yota_width = 0;
+        this.yota_height = 0;
+        this.yota_x = 0;
+        this.yota_y = 0;
+        this.yota.onload = function () {
+            tar.yota_scale = tar.width / tar.yota.width / 2.5;
+            tar.yota_width = tar.yota.width * tar.yota_scale;
+            tar.yota_height = tar.yota.height * tar.yota_scale;
+            tar.yota_x = tar.x - tar.yota_width / 2;
+            tar.yota_y = tar.y - tar.yota_height / 2 - tar.height / 7;
+        };
         this.min_counter = new Counter(min_type, this.x - this.width / 5, this.y + this.height / 5);
         this.gb_counter = new Counter(gb_type, this.x + this.width / 5, this.y + this.height / 5);
         this.rad_corner = this.width / 8;
     }
     draw_tariff() {
-        this.yota_scale = this.width / this.yota.width / 2.5;
-        this.yota_width = this.yota.width * this.yota_scale;
-        this.yota_height = this.yota.height * this.yota_scale;
-        this.yota_x = this.x - this.yota_width / 2;
-        this.yota_y = this.y - this.yota_height / 2 - this.height / 7;
-
         cntx.beginPath();
         const half_w = this.width / 2;
         const half_h = this.height / 2;

@@ -1,24 +1,23 @@
 const win_ratio = document.documentElement.clientHeight / document.documentElement.clientWidth;
 const cnvs = document.getElementById("cnvs");
 const cntx = cnvs.getContext("2d");
-const cnvs_w = document.body.getBoundingClientRect().width - cnvs.offsetLeft;
-const cnvs_h = cnvs_w * win_ratio - cnvs.offsetTop;
+const cnvs_w = document.body.getBoundingClientRect().width;
+const cnvs_h = cnvs_w * win_ratio;
 const adaptive = win_ratio > 1 ? cnvs_h : cnvs_w;
 const simple_font_size = adaptive / 35;
 const small_font_size = simple_font_size / 2.4;
 const line_width = simple_font_size / 8;
 const txt_y_magic = simple_font_size / 3;
 const cloud_txt_ratio = 1.3;
-const small_rotation = 0.15;
 const gb_type = 0;
 const min_type = 1;
 const types = ["ГБ", "мин"];
-const gbs = [1, 2, 5, 10];
-const mins = [5, 20, 50, 200];
+const gbs = [1, 2, 3, 4];
+const mins = [1, 5, 10, 20];
 const infinity = "∞";
 const simple_speed = adaptive / 1500;
-const boost = simple_speed * 2;
-const boost_radius = adaptive / 6;
+const min_boost = 3;
+const max_boost = 4;
 const btn_rad = adaptive / 60;
 const minus_w = adaptive / 60;
 const minus_h = minus_w / 3;
@@ -38,7 +37,7 @@ const cloud_speed_color = [
     "#33c9ff",
     "#4dcfff"
 ];
-const simple_cooldown = 8;
+const simple_cooldown = 6;
 const fast_cooldown = 1;
 const btn_timer = 60;
 
@@ -57,10 +56,10 @@ var gb_btn_counter = 0;
 var gb_btn_timer = 0;
 var min_btn_counter = 0;
 var min_btn_timer = 0;
-var mouse_x = null;
-var mouse_y = null;
-var caught = null;
+var caught = false;
+var movement = false;
 var tar = new Tariff();
+var yb = new Yota_button();
 const arr = [
     new Cloud(gbs[0], gb_type),
     new Cloud(gbs[1], gb_type),
@@ -89,35 +88,37 @@ function draw() {
     tar.draw_tariff();
 
     for (let i = 0; i < arr.length; i++) {
-        if (arr[i].caught) {
-            arr[i].x = mouse_x;
-            arr[i].y = mouse_y;
-        } else {
-            var dx = arr[i].x - mouse_x;
-            var dy = arr[i].y - mouse_y;
-            var r = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-            if (r < boost_radius) {
-                arr[i].speed = boost - (boost - simple_speed) * r / boost_radius;
-                arr[i].angle = Math.atan2(dy, dx);
-            } else {
-                arr[i].speed = simple_speed;
-            }
+        arr[i].y += arr[i].speed;
 
-            var half_w = arr[i].width / 2;
-            var half_h = arr[i].height / 2;
-            if (arr[i].x < half_w || arr[i].x > cnvs.width - half_w ||
-                arr[i].y < half_h || arr[i].y > cnvs.height - half_h) {
-                var center_x = cnvs.width / 2;
-                var center_y = cnvs.height / 2;
-                arr[i].angle = Math.atan2(center_y - arr[i].y, center_x - arr[i].x);
+        if (arr[i].x - tar.x > -tar.width / 2 && arr[i].x - tar.x < tar.width / 2 &&
+            arr[i].y - tar.y > -tar.height / 2 && arr[i].y - tar.y < tar.height / 2) {
+            if (arr[i].type === gb_type) {
+                if (tar.gb_counter.number + arr[i].number > 50) {
+                    tar.gb_counter.number = 51;
+                    tar.gb_counter.infinity = true;
+                } else {
+                    tar.gb_counter.number += arr[i].number;
+                }
             } else {
-                arr[i].angle += small_rotation - 2 * small_rotation * Math.random();
+                if (tar.min_counter.number + arr[i].number > 2000) {
+                    tar.min_counter.number = 2000;
+                } else {
+                    tar.min_counter.number += arr[i].number;
+                }
             }
-            arr[i].x += arr[i].speed * Math.cos(arr[i].angle);
-            arr[i].y += arr[i].speed * Math.sin(arr[i].angle);
+            arr[i].new_position();
+            caught = true;
+        }
+
+        if (arr[i].y > cnvs.height + arr[i].height / 2) {
+            arr[i].new_position();
         }
 
         arr[i].draw_cloud();
+    }
+
+    if (caught) {
+        yb.draw_complete();
     }
 
     requestAnimationFrame(draw);

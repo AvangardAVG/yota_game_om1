@@ -1,14 +1,19 @@
 function on_mousemove(e) {
-    mouse_x = e.clientX - cnvs.offsetLeft;
-    mouse_y = e.clientY - cnvs.offsetTop;
+    if (movement) {
+        tar.x = e.clientX - cnvs.offsetLeft;
+        tar.yota_x = tar.x - tar.yota_width / 2;
+        tar.gb_counter.x = tar.x + tar.width / 5;
+        tar.gb_counter.btn_x = tar.x + tar.width / 5;
+        tar.min_counter.x = tar.x - tar.width / 5;
+        tar.min_counter.btn_x = tar.x - tar.width / 5;
+    }
 }
 
 function on_touchmove(e) {
     e.preventDefault();
     var touch = e.touches[0];
     var mouse_event = new MouseEvent("mousemove", {
-        clientX: touch.clientX,
-        clientY: touch.clientY
+        clientX: touch.clientX
     });
     dispatchEvent(mouse_event);
 }
@@ -48,12 +53,17 @@ function cnvs_on_mousedown(e) {
         }
     }
 
-    for (let i = 0; i < arr.length; i++) {
-        if (Math.abs(mouse_down_x - arr[i].x) <= arr[i].width / 2 &&
-            Math.abs(mouse_down_y - arr[i].y) <= arr[i].height / 2) {
-            arr[i].caught = true;
-            caught = arr[i];
-            break;
+    if (mouse_down_x - tar.x > -tar.width / 2 && mouse_down_x - tar.x < tar.width / 2 &&
+        mouse_down_y - tar.y > -tar.height / 2 && mouse_down_y - tar.y < tar.height / 2) {
+        movement = true;
+    }
+
+    if (caught) {
+        if (mouse_down_x - yb.x > -yb.width / 2 && mouse_down_x - yb.x < yb.width / 2 &&
+            mouse_down_y - yb.y > -yb.height / 2 && mouse_down_y - yb.y < yb.height / 2) {
+            var url = "https://www.yota.ru/voice?min=" + tar.min_counter.number.toString() + "&gb=";
+            url += (tar.gb_counter.infinity) ? ("un") : (tar.gb_counter.number.toString());
+            window.open(url);
         }
     }
 }
@@ -65,51 +75,19 @@ function cnvs_on_touchstart(e) {
         clientX: touch.clientX,
         clientY: touch.clientY
     });
-    mouse_x = touch.clientX;
-    mouse_y = touch.clientY;
     cnvs.dispatchEvent(mouse_event);
 }
 
 function cnvs_on_mouseleave() {
-    caught.caught = false;
-    caught = null;
+    movement = false;
 }
 
-function cnvs_on_mouseup(e) {
-    if (caught != null) {
-        const mouse_up_x = e.clientX - cnvs.offsetLeft;
-        const mouse_up_y = e.clientY - cnvs.offsetTop;
-        if (mouse_up_x - tar.x > -tar.width / 2 && mouse_up_x - tar.x < tar.width / 2 &&
-            mouse_up_y - tar.y > -tar.height / 2 && mouse_up_y - tar.y < tar.height / 2) {
-            if (caught.type === gb_type) {
-                if (tar.gb_counter.number + caught.number > 50) {
-                    tar.gb_counter.number = 51;
-                    tar.gb_counter.infinity = true;
-                } else {
-                    tar.gb_counter.number += caught.number;
-                }
-            } else {
-                if (tar.min_counter.number + caught.number > 2000) {
-                    tar.min_counter.number = 2000;
-                } else {
-                    tar.min_counter.number += caught.number;
-                }
-            }
-            caught.new_position();
-        }
-        caught.caught = false;
-        caught = null;
-    }
+function cnvs_on_mouseup() {
+    movement = false;
 }
 
 function cnvs_on_touchend(e) {
     e.preventDefault();
-    var touch = e.changedTouches[0];
-    var mouse_event = new MouseEvent("mouseup", {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-    });
-    mouse_x = touch.clientX;
-    mouse_y = touch.clientY;
+    var mouse_event = new MouseEvent("mouseup", { });
     cnvs.dispatchEvent(mouse_event);
 }

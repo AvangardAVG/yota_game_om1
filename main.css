@@ -1,4 +1,7 @@
-#cnvs{
+html{
     overflow: hidden;
+}
+
+#cnvs{
     border: 1px solid black;
 }
