@@ -1,25 +1,11 @@
-class Tariff {
+class Barrel {
     constructor() {
-        this.width = adaptive / 5.5;
-        this.height = adaptive / 4;
+        this.width = adaptive / 6;
+        this.height = adaptive / 10;
         this.x = cnvs_w / 2;
-        this.y = cnvs_h - this.height / 2 - 2 * simple_font_size * cloud_txt_ratio;
-        this.yota = new Image();
-        this.yota.src = "res/yota.png";
-        this.yota_scale = 0;
-        this.yota_width = 0;
-        this.yota_height = 0;
-        this.yota_x = 0;
-        this.yota_y = 0;
-        this.yota.onload = function () {
-            tar.yota_scale = tar.width / tar.yota.width / 2.5;
-            tar.yota_width = tar.yota.width * tar.yota_scale;
-            tar.yota_height = tar.yota.height * tar.yota_scale;
-            tar.yota_x = tar.x - tar.yota_width / 2;
-            tar.yota_y = tar.y - tar.yota_height / 2 - tar.height / 7;
-        };
-        this.min_counter = new Counter(min_type, this.x - this.width / 5, this.y + this.height / 5);
-        this.gb_counter = new Counter(gb_type, this.x + this.width / 5, this.y + this.height / 5);
+        this.y = cnvs_h - this.height / 2 - 2 * big_font_size * cloud_txt_ratio;
+        this.min_counter = new Counter(min_type, this.x - this.width / 4, this.y);
+        this.gb_counter = new Counter(gb_type, this.x + this.width / 4, this.y);
         this.rad_corner = this.width / 8;
     }
     draw_tariff() {
@@ -52,9 +38,13 @@ class Tariff {
         cntx.fill();
         cntx.closePath();
 
-        cntx.drawImage(this.yota, this.yota_x, this.yota_y, this.yota_width, this.yota_height);
-
         this.gb_counter.draw_counter();
         this.min_counter.draw_counter();
+    }
+    change_pos(x, y) {
+        this.x = x;
+        this.y = y;
+        this.min_counter.change_pos(x - this.width / 4, y);
+        this.gb_counter.change_pos(x + this.width / 4, y);
     }
 }
