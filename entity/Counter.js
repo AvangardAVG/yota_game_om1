@@ -85,7 +85,7 @@ class Counter {
     decrement() {
         if (this.infinity) this.infinity = false;
         if (this.number - (this.type === gb_type ? gbs[this.dec_counter] : mins[this.dec_counter]) < 0) {
-            this.number = 0;
+            this.number = (this.type === gb_type ? 1 : 0);
         } else {
             this.number -= this.type === gb_type ? gbs[this.dec_counter] : mins[this.dec_counter];
         }

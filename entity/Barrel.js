@@ -6,6 +6,7 @@ class Barrel {
         this.y = cnvs_h - this.height / 2 - 2 * big_font_size * cloud_txt_ratio;
         this.min_counter = new Counter(min_type, this.x - this.width / 4, this.y);
         this.gb_counter = new Counter(gb_type, this.x + this.width / 4, this.y);
+        this.gb_counter.number = 1;
         this.rad_corner = this.width / 8;
     }
     draw_tariff() {
